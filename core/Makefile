@@ -1328,32 +1328,18 @@ INTERNAL_OTA_PACKAGE_TARGET := $(PRODUCT_OUT)/$(name)-$(ROM_VERSION).zip
 
 $(INTERNAL_OTA_PACKAGE_TARGET): KEY_CERT_PAIR := $(DEFAULT_KEY_CERT_PAIR)
 
-ifneq ($(skip_cache.img),true)
-
-CACHE_IMAGE_ZIP := $(name)-cache-$(ROM_VERSION).zip
-CACHE_SIZE := 500M
-
-ifneq ($(BOARD_CACHEIMAGE_SIZE),)
-CACHE_SIZE := BOARD_CACHEIMAGE_SIZE
-endif
-
-$(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
-	@echo -e ${PRT_HST}"Package OTA: $@"${CL_RST}
-	./build/tools/releasetools/ota_from_target_files -v \
-	   -p $(HOST_OUT) \
-	   -k $(KEY_CERT_PAIR) \
-	   $(BUILT_TARGET_FILES_PACKAGE) $@
-	$(hide) @echo -e ${PRT_IMG}"----- Making cache installer image ------"${CL_RST}
-	./build/tools/gapps.sh $(INTERNAL_OTA_PACKAGE_TARGET) $(CACHE_IMAGE_ZIP) $(PRODUCT_OUT) $(CACHE_SIZE) $(HOST_OUT_EXECUTABLES)/mkuserimg.sh
-	@echo -e ${PRT_IMG}"----- Made cache installer image: $(CACHE_IMAGE_ZIP) --------" ${CL_RST}
-
+ifeq ($(TARGET_OTA_ASSERT_DEVICE),)
+    $(INTERNAL_OTA_PACKAGE_TARGET): override_device := auto
 else
+    $(INTERNAL_OTA_PACKAGE_TARGET): override_device := $(TARGET_OTA_ASSERT_DEVICE)
+endif
 
 $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	@echo -e ${PRT_HST}"Package OTA: $@"${CL_RST}
 	$(hide) ./build/tools/releasetools/ota_from_target_files -v \
 	   -p $(HOST_OUT) \
 	   -k $(KEY_CERT_PAIR) \
+	   --override_device=$(override_device) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
 endif # skip_cache.img
