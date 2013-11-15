@@ -1319,7 +1319,7 @@ ifneq ($(TARGET_NO_KERNEL),true)
 ifneq ($(recovery_fstab),)
 
 # -----------------------------------------------------------------
-# OTA update package && cache installer image
+# OTA update package
 
 name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
@@ -1344,7 +1344,6 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	   --override_device=$(override_device) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-endif # skip_cache.img
 
 .PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
